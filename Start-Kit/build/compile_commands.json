@@ -1,0 +1,47 @@
+[
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/ActionModel.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/ActionModel.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/ActionModel.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/CompetitionSystem.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/CompetitionSystem.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/CompetitionSystem.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/Evaluation.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/Evaluation.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/Evaluation.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/Grid.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/Grid.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/Grid.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/Logger.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/Logger.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/Logger.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/MAPFPlanner.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/MAPFPlanner.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/MAPFPlanner.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/States.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/States.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/States.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/common.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/common.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/common.cpp"
+},
+{
+  "directory": "/home/user1/Desktop/mapf-competition/Start-Kit/build",
+  "command": "/usr/bin/c++ -DBOOST_ALL_NO_LIB -DBOOST_ATOMIC_DYN_LINK -DBOOST_CHRONO_DYN_LINK -DBOOST_DATE_TIME_DYN_LINK -DBOOST_FILESYSTEM_DYN_LINK -DBOOST_LOG_DYN_LINK -DBOOST_LOG_SETUP_DYN_LINK -DBOOST_PROGRAM_OPTIONS_DYN_LINK -DBOOST_REGEX_DYN_LINK -DBOOST_SYSTEM_DYN_LINK -DBOOST_THREAD_DYN_LINK -DPYTHON=0 -I/home/user1/Desktop/mapf-competition/Start-Kit/inc -isystem /home/user1/anaconda/yes/include -g -o CMakeFiles/lifelong.dir/src/driver.cpp.o -c /home/user1/Desktop/mapf-competition/Start-Kit/src/driver.cpp",
+  "file": "/home/user1/Desktop/mapf-competition/Start-Kit/src/driver.cpp"
+}
+]

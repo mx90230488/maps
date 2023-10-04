@@ -1,0 +1,4 @@
+/home/user1/Desktop/mapf-competition/Start-Kit/build/CMakeFiles/lifelong.dir
+/home/user1/Desktop/mapf-competition/Start-Kit/build/CMakeFiles/clean_all.dir
+/home/user1/Desktop/mapf-competition/Start-Kit/build/CMakeFiles/edit_cache.dir
+/home/user1/Desktop/mapf-competition/Start-Kit/build/CMakeFiles/rebuild_cache.dir
