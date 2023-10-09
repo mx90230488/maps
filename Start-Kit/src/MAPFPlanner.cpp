@@ -1,5 +1,6 @@
 #include <MAPFPlanner.h>
 #include <random>
+#include<filesystem>
 TreeNode::TreeNode() = default;
 TreeNode::~TreeNode() = default;
 
@@ -142,8 +143,8 @@ Conflict_my MAPFPlanner::getFirstConflict(TreeNode&node){
             int min_idx=std::min(solutions[i].size(),solutions[j].size());
             for(int k=0;k<min_idx;k++){
                 if(solutions[i][k].first==solutions[j][k].first){
-                    //cout<<"i :"<<i<<" j "<<j<<" solutions[i][k].first "<<solutions[i][k].first<<" node.node_env.curr_timestep+k "<<node.node_env.curr_timestep+k<<endl;
-                    return Conflict_my(i,j,solutions[i][k].first,solutions[j][k].first,node.node_env.curr_timestep+k);
+                    //cout<<"i :"<<i<<" j "<<j<<" solutions[i][k].first "<<solutions[i][k].first<<" k "<<k<<endl;
+                    return Conflict_my(i,j,solutions[i][k].first,solutions[j][k].first,k);
                 }
                     
             }
@@ -156,7 +157,7 @@ Conflict_my MAPFPlanner::getFirstConflict(TreeNode&node){
                 //cout<<solutions[i][k].first<<" "<<solutions[j][k+1].first<<" "<<solutions[i][k+1].first<<" "<<solutions[j][k].first<<endl;
                 if(solutions[i][k].first==solutions[j][k+1].first&&solutions[i][k+1].first==solutions[j][k].first){
                     //cout<<"solutions[i][k+1].first "<<solutions[i][k+1].first<<" solutions[j][k+1] "<<solutions[j][k+1].first<<" time: "<<node.node_env.curr_timestep+k<<endl;
-                    return Conflict_my(i,j,solutions[i][k+1].first,solutions[j][k+1].first,node.node_env.curr_timestep+k);
+                    return Conflict_my(i,j,solutions[i][k+1].first,solutions[j][k+1].first,k);
                 }
                     
             }
@@ -200,14 +201,21 @@ std::vector<TreeNode> MAPFPlanner::remove_node(std::vector<TreeNode>&tree,TreeNo
 }
 void MAPFPlanner::initialize(int preprocess_time_limit)
 {
+    /*
+    std::filesystem::path currpath=std::filesystem::current_path();
+    string path_str=currpath.string();
+    cout<<" path_str "<<path_str<<endl;
+    path_str+="/"env->map_name
+    */
     cout << "planner initialize done" << endl;
+
 }
 
 
 // plan using simple A* that ignores the time dimension
 void MAPFPlanner::plan(int time_limit,vector<Action> & actions) 
 {
-    //cout<<"plan env_time: "<<env->curr_timestep<<endl;
+    //cout<<"plan map: "<<env->map_name<<endl;
     actions = std::vector<Action>(env->curr_states.size(), Action::W);
     //priority_queue<TreeNode,vector<TreeNode>,cmp1>tree;
     vector<TreeNode>tree;
@@ -387,7 +395,7 @@ vector<pair<int,int>> TreeNode::single_agent_plan(int start,int start_direct,int
     unordered_map<int,AstarNode*> all_nodes;
     unordered_set<int> close_list;
     AstarNode* s = new AstarNode(start, start_direct, 0, getManhattanDistance(start,end), nullptr);
-    s->t=plan_time;
+    s->t=0;
     open_list.push(s);
     all_nodes[start*4 + start_direct] = s;
     //int find=0;
