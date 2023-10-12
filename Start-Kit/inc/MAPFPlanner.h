@@ -2,7 +2,7 @@
 #include <ctime>
 #include "SharedEnv.h"
 #include "ActionModel.h"
-
+#include <atomic>
 struct Constraint_my {
     int location;
     int agentid;
@@ -67,6 +67,9 @@ public:
     
     SharedEnvironment* env;
     TreeNode root;
+    std::vector<TreeNode> tree;
+    std::atomic<bool> lock1;
+    bool start=true;
 	MAPFPlanner(SharedEnvironment* env): env(env){};
     MAPFPlanner(){
         env = new SharedEnvironment();
@@ -79,8 +82,9 @@ public:
 
     // return next states for all agents
     virtual void plan(int time_limit, std::vector<Action> & plan);
-    int getMinCost(std::vector<TreeNode>&tree);
-    std::vector<TreeNode> remove_node(std::vector<TreeNode>&tree,TreeNode&p);
+    std::vector<Action> thread_plan();
+    int getMinCost();
+    std::vector<TreeNode> remove_node(TreeNode&p);
     // Start kit dummy implementation
     //std::vector<pair<int,int>>single_agent_plan(int start,int start_direct, int end,int agentid);
     //bool is_constraint(int agentid,int x,int y,int time,std::vector<Constraint_my>&constraints);
@@ -90,7 +94,7 @@ public:
     //void update_solution();
     //void add_constraint(Constraint_my & constraint);
     //void update_cost();
-    TreeNode find_best_node(std::vector<TreeNode>&tree);
+    TreeNode find_best_node();
     bool hasconflict(TreeNode&node);
     bool hasconflict(std::vector<pair<int,int>>&a,std::vector<pair<int,int>>&b);
     bool hasEdgeConflict(TreeNode&node);

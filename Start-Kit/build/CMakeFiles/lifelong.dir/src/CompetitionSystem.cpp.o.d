@@ -1964,5 +1964,4 @@ CMakeFiles/lifelong.dir/src/CompetitionSystem.cpp.o: \
  /usr/include/c++/11/future /usr/include/c++/11/condition_variable \
  /usr/include/c++/11/bits/atomic_futex.h \
  /usr/include/c++/11/bits/std_thread.h \
- /home/user1/Desktop/mapf-competition/Start-Kit/inc/nlohmann/json.hpp \
- /usr/include/c++/11/thread /usr/include/c++/11/bits/this_thread_sleep.h
+ /home/user1/Desktop/mapf-competition/Start-Kit/inc/nlohmann/json.hpp

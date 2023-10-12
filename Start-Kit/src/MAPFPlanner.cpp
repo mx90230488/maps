@@ -1,6 +1,9 @@
 #include <MAPFPlanner.h>
 #include <random>
 #include<filesystem>
+#include <thread>
+#include<chrono>
+#include<future>
 TreeNode::TreeNode() = default;
 TreeNode::~TreeNode() = default;
 
@@ -65,8 +68,8 @@ void TreeNode::update_cost(){
     }
     this->cost=cost_t;
 }
-TreeNode MAPFPlanner::find_best_node(std::vector<TreeNode>&tree){
-    int mi=getMinCost(tree);
+TreeNode MAPFPlanner::find_best_node(){
+    int mi=getMinCost();
     //TreeNode ret(*env);
     for(int i=0;i<tree.size();i++){
         if(tree[i].cost==mi){
@@ -79,7 +82,7 @@ TreeNode MAPFPlanner::find_best_node(std::vector<TreeNode>&tree){
     }
     return TreeNode();
 }
-int MAPFPlanner::getMinCost(std::vector<TreeNode>&tree){
+int MAPFPlanner::getMinCost(){
     int min=INT_MAX;
     for(auto &node:tree){
         if(node.cost<min){
@@ -165,7 +168,7 @@ Conflict_my MAPFPlanner::getFirstConflict(TreeNode&node){
     }
     return Conflict_my(0,0,0,0,0);
 }
-std::vector<TreeNode> MAPFPlanner::remove_node(std::vector<TreeNode>&tree,TreeNode &p){
+std::vector<TreeNode> MAPFPlanner::remove_node(TreeNode &p){
     vector<TreeNode>temp;
     auto it=std::find(tree.begin(),tree.end(),p);
     //cout<<"it "<<it->cost<<endl;
@@ -210,126 +213,165 @@ void MAPFPlanner::initialize(int preprocess_time_limit)
     cout << "planner initialize done" << endl;
 
 }
+vector<Action> MAPFPlanner::thread_plan(){
+    
+    //std::cout<<"time "<<env->curr_timestep<<std::endl;
+    auto actions = std::vector<Action>(env->curr_states.size(), Action::W);
+    if(start==true){
+        TreeNode r(*env);
+        r.update_solution();
+        r.update_cost();
+        //cout<<"r.cost : "<<r.cost<<endl;
+        tree.push_back(r);
+    }
+    
+    std::vector<std::vector<pair<int,int>>>ret;
+    
+        while(lock1==true&&!tree.empty()){
+            /*
+            for(auto t:tree){
+                cout<<"node---"<<endl;
+                for(auto a:t.constraints){
+                        cout<<"a.agentid "<<a.agentid<<" a.location "<<a.location<<" a.time "<<a.time<<endl;
+                    }
+            }
+            cout<<"================\n";
+            */
+            //cout<<"time: "<<env->curr_timestep<<endl;
+            //std::vector<TreeNode>te;
+            //cout<<"before q"<<endl;
+            TreeNode p=find_best_node();
+            p.node_env=*env;
+            tree=remove_node(p);
+            
+            //p=find_best_node(tree);
+            //p=t;
+            //cout<<"p.cost: "<<p.cost<<endl;
+            //cout<<"tree.top().cost"<<tree.top().cost<<endl;
+            //remove_node(tree,p);
+            //cout<<tree[0].solution[3][8].first<<endl;
+            if(!hasconflict(p)&&!hasEdgeConflict(p)){
+                //cout<<"no conflict----\n";
+                //cout<<"p.solution "<<p.solution[0].size()<<endl;
+                ret=p.solution;
+                break;
+            }
+            else if(hasconflict(p)){
+                //cout<<"conflict\n";
+                Conflict_my conflict =getFirstConflict(p);
+                //tree.pop_back();
+                
+                for(int i=0;i<2;i++){
+                    TreeNode A=p;
+                    auto new_constraint=Constraint_my(conflict.location1,conflict.conflict_agent.first,conflict.time);
+                    if(i==1)
+                        new_constraint=Constraint_my(conflict.location2,conflict.conflict_agent.second,conflict.time);
+                    A.add_constraint(new_constraint);
+                    
+                    //cout<<"A.constraints.size()  "<<A.constraints.size()<<endl;
+                    
+                    if(A.update_solution()==false) continue;
+                    for(auto a:A.constraints){
+                        //cout<<"a.agentid "<<a.agentid<<" a.location "<<a.location<<" a.time "<<a.time<<endl;
+                    }
+                    /*
+                    cout<<"solution--------------\n";
+                    for(int k=0;k<A.solution.size();k++){
+                        cout<<"agent "<<k<<endl;
+                        for(int i=0;i<A.solution[k].size();i++){
+                            cout<<"location "<<A.solution[k][i].first<<" direction "<<A.solution[k][i].second<<endl;
+                        }
+                    }
+                    */
+                    A.update_cost();
+                    if(A.cost<INT_MAX) tree.emplace_back(A);
+                }
+                
+            }else if(hasEdgeConflict(p)){
+                //cout<<"EdgeConflict----\n";
+                auto conflict=getFirstConflict(p);
+                //cout<<conflict.location1<<" "<<conflict.location2<<" "<<conflict.time<<" "<<conflict.conflict_agent.first<<" "<<conflict.conflict_agent.second<<endl;
+                for(int i=0;i<2;i++){
+                    TreeNode A=p;
+                    //cout<<"A.cost : "<<A.cost<<"p.cost : "<<p.cost<<endl;
+                    auto new_constraint=Constraint_my(conflict.location2,conflict.conflict_agent.first,conflict.time);
+                    auto constraint2=Constraint_my(conflict.location1,conflict.conflict_agent.first,conflict.time+1);
+                    if(i==1){
+                        new_constraint=Constraint_my(conflict.location1,conflict.conflict_agent.second,conflict.time);
+                        constraint2=Constraint_my(conflict.location2,conflict.conflict_agent.second,conflict.time+1);
+                    }
+                    //cout<<"before: A.constraints.size():  "<<A.constraints.size()<<endl;
+                    A.add_constraint(new_constraint);
+                    A.add_constraint(constraint2);
+                    //cout<<"A.constraints.size()  "<<A.constraints.size()<<endl;
+                    //cout<<"after: A.constraints.size():  "<<A.constraints.size()<<endl;
+                    if(A.update_solution()==false) continue;
+                    
+                    for(auto a:A.constraints){
+                        //cout<<"a.agentid "<<a.agentid<<" a.location "<<a.location<<" a.time "<<a.time<<endl;
+                    }
+                    A.update_cost();
+                    
+                    if(A.cost<INT_MAX) tree.emplace_back(A);
+                }
+                //remove_node(tree,p);
+            }
+        }
+        if(lock1==true)
+            tree.clear();
+        for(int i=0;i<ret.size();i++){
+                if(ret[i][1].first!=env->curr_states[i].location){
+                    actions[i]=Action::FW;
+                    //cout<<"agent "<<i<<" fw "<<endl;
+                }
+                else if(ret[i][1].second!=env->curr_states[i].orientation){
+                    int incur=ret[i][1].second-env->curr_states[i].orientation;
+                    if(incur==1||incur==-3){
+                        actions[i]=Action::CR;
+                        //cout<<"agent "<<i<<" cr "<<endl;
+                    }
+                    else if(incur==-1||incur==3){
+                        actions[i]=Action::CCR;
+                        //cout<<"agent "<<i<<" ccr "<<endl;
+                    }
+                }
+                //cout<<"agent "<<i<<" wait "<<endl;
+            }
+        
+        return actions;
+    
+    //cout<<"ret[0][1].first"<<ret[0][1].first<<endl;
 
+}
 
 // plan using simple A* that ignores the time dimension
 void MAPFPlanner::plan(int time_limit,vector<Action> & actions) 
 {
-    //cout<<"plan map: "<<env->map_name<<endl;
+    lock1=true;
     actions = std::vector<Action>(env->curr_states.size(), Action::W);
+    std::packaged_task<std::vector<Action>()>task1(std::bind(&MAPFPlanner::thread_plan,this));
+    auto future1=task1.get_future();
+    auto task_td1=std::thread(std::move(task1));
+    std::future_status ret=future1.wait_for(std::chrono::seconds(time_limit));
+    if(ret==std::future_status::ready){
+        
+        task_td1.join();
+        start=true;
+        //cout<<"ready\n";
+        actions=future1.get();
+    }else if(ret==std::future_status::timeout){
+        lock1=false;
+        start=false;
+        task_td1.join();
+        //cout<<"timeout\n";
+        //cout<<tree.size()<<endl;
+        lock1=true;
+    }
+    //cout<<"plan map: "<<env->map_name<<endl;
+    
     //priority_queue<TreeNode,vector<TreeNode>,cmp1>tree;
-    vector<TreeNode>tree;
-    TreeNode r(*env);
-    r.update_solution();
-    r.update_cost();
-    //cout<<"r.cost : "<<r.cost<<endl;
-    tree.push_back(r);
-    std::vector<std::vector<pair<int,int>>>ret;
-    while(!tree.empty()){
-        //cout<<"tree.size() "<<tree.size()<<endl;
-        //cout<<"time: "<<env->curr_timestep<<endl;
-        //std::vector<TreeNode>te;
-        //cout<<"before q"<<endl;
-        TreeNode p=find_best_node(tree);
-        p.node_env=*env;
-        tree=remove_node(tree,p);
-        
-        //p=find_best_node(tree);
-        //p=t;
-        //cout<<"p.cost: "<<p.cost<<endl;
-        //cout<<"tree.top().cost"<<tree.top().cost<<endl;
-        //remove_node(tree,p);
-        //cout<<tree[0].solution[3][8].first<<endl;
-        if(!hasconflict(p)&&!hasEdgeConflict(p)){
-            //cout<<"no conflict----\n";
-            //cout<<"p.solution "<<p.solution[0].size()<<endl;
-            ret=p.solution;
-            break;
-        }
-        else if(hasconflict(p)){
-            
-            //cout<<"conflict\n";
-        
-            
-            Conflict_my conflict =getFirstConflict(p);
-            //tree.pop_back();
-            
-            for(int i=0;i<2;i++){
-                TreeNode A=p;
-                auto new_constraint=Constraint_my(conflict.location1,conflict.conflict_agent.first,conflict.time);
-                if(i==1)
-                    new_constraint=Constraint_my(conflict.location2,conflict.conflict_agent.second,conflict.time);
-                A.add_constraint(new_constraint);
-                
-                //cout<<"A.constraints.size()  "<<A.constraints.size()<<endl;
-                
-                if(A.update_solution()==false) continue;
-                for(auto a:A.constraints){
-                    //cout<<"a.agentid "<<a.agentid<<" a.location "<<a.location<<" a.time "<<a.time<<endl;
-                }
-                /*
-                cout<<"solution--------------\n";
-                for(int k=0;k<A.solution.size();k++){
-                    cout<<"agent "<<k<<endl;
-                    for(int i=0;i<A.solution[k].size();i++){
-                        cout<<"location "<<A.solution[k][i].first<<" direction "<<A.solution[k][i].second<<endl;
-                    }
-                }
-                */
-                A.update_cost();
-                if(A.cost<INT_MAX) tree.emplace_back(A);
-            }
-            
-        }else if(hasEdgeConflict(p)){
-            //cout<<"EdgeConflict----\n";
-            auto conflict=getFirstConflict(p);
-            //cout<<conflict.location1<<" "<<conflict.location2<<" "<<conflict.time<<" "<<conflict.conflict_agent.first<<" "<<conflict.conflict_agent.second<<endl;
-            for(int i=0;i<2;i++){
-                TreeNode A=p;
-                //cout<<"A.cost : "<<A.cost<<"p.cost : "<<p.cost<<endl;
-                auto new_constraint=Constraint_my(conflict.location2,conflict.conflict_agent.first,conflict.time);
-                auto constraint2=Constraint_my(conflict.location1,conflict.conflict_agent.first,conflict.time+1);
-                if(i==1){
-                    new_constraint=Constraint_my(conflict.location1,conflict.conflict_agent.second,conflict.time);
-                    constraint2=Constraint_my(conflict.location2,conflict.conflict_agent.second,conflict.time+1);
-                }
-                //cout<<"before: A.constraints.size():  "<<A.constraints.size()<<endl;
-                A.add_constraint(new_constraint);
-                A.add_constraint(constraint2);
-                //cout<<"A.constraints.size()  "<<A.constraints.size()<<endl;
-                //cout<<"after: A.constraints.size():  "<<A.constraints.size()<<endl;
-                if(A.update_solution()==false) continue;
-                
-                for(auto a:A.constraints){
-                    //cout<<"a.agentid "<<a.agentid<<" a.location "<<a.location<<" a.time "<<a.time<<endl;
-                }
-                A.update_cost();
-                
-                if(A.cost<INT_MAX) tree.emplace_back(A);
-            }
-            //remove_node(tree,p);
-        }
-
-    }
-    //cout<<"ret[0][1].first"<<ret[0][1].first<<endl;
-    for(int i=0;i<ret.size();i++){
-        if(ret[i][1].first!=env->curr_states[i].location){
-            actions[i]=Action::FW;
-            //cout<<"agent "<<i<<" fw "<<endl;
-        }
-        else if(ret[i][1].second!=env->curr_states[i].orientation){
-            int incur=ret[i][1].second-env->curr_states[i].orientation;
-            if(incur==1||incur==-3){
-                actions[i]=Action::CR;
-                //cout<<"agent "<<i<<" cr "<<endl;
-            }
-            else if(incur==-1||incur==3){
-                actions[i]=Action::CCR;
-                //cout<<"agent "<<i<<" ccr "<<endl;
-            }
-        }
-        //cout<<"agent "<<i<<" wait "<<endl;
-    }
+    
+    
     //cout<<"action after\n";
     /*
     for (int i = 0; i < env->num_of_agents; i++) 
@@ -368,7 +410,7 @@ void MAPFPlanner::plan(int time_limit,vector<Action> & actions)
     }
     */
     //root.solution.clear();
-  return;
+  
 }
 bool TreeNode::is_constraint(int agentid,int location,int time,std::vector<Constraint_my>&constraints){
     //cout<<"location : "<<location<<" agentid : "<<agentid<<" time : ---"<<time<<endl;
