@@ -3,6 +3,24 @@
 #include "SharedEnv.h"
 #include "ActionModel.h"
 #include <atomic>
+#include <boost/heap/d_ary_heap.hpp>
+struct Node;
+struct TreeNode;
+
+typedef typename boost::heap::d_ary_heap<TreeNode,boost::heap::arity<2>,boost::heap::mutable_<true>>high_open;
+typedef typename high_open::handle_type high_handle;
+struct State_my
+{
+    int location;
+    int timestep;
+    int orientation;
+    State_my(int location,int timestep,int orientation) :timestep(timestep),location(location),orientation(orientation){}
+
+    bool operator==(const State_my&other) const{
+        return timestep==other.timestep&&location==other.location;
+    }
+    bool equalExceptTime(const State_my&other) const{return location==other.location&&timestep==other.timestep;}
+};
 struct Constraint_my {
     int location;
     int agentid;
@@ -29,22 +47,27 @@ struct TreeNode
 {
     SharedEnvironment node_env;
     int cost=0;
+    int focal;
+    
+    high_handle handle;
     std::vector<std::vector<pair<int,int>>>solution;
     std::vector<Constraint_my>constraints;
     std::vector<pair<int,int>> single_agent_plan(int start,int start_direct,int end,int agentid);
     //int getManhattanDistance(int loc1, int loc2);
-    list<pair<int,int>>getNeighbors(int location,int direction,int agentid,int time);
+    std::vector<State_my> getNeighbors(State_my &current);
     bool validateMove(int loc, int loc2);
     int getManhattanDistance(int loc1, int loc2);
     bool update_solution();
     void update_cost();
     void add_constraint(Constraint_my &constraint);
     bool is_constraint(int agentid,int location,int time,std::vector<Constraint_my>&constraints);
-
+    int vertex_conflict(State_my&s,int agentid);
+    int edge_conflict(State_my&s1,State_my&s2,int agentid);
 
     TreeNode();
     TreeNode(std::vector<Constraint_my>&constraints):constraints(constraints){};
     TreeNode(SharedEnvironment env):node_env(env){};
+    /*
     TreeNode operator=(const TreeNode &node)const{
         TreeNode t(node.node_env);
         t.constraints=node.constraints;
@@ -53,23 +76,38 @@ struct TreeNode
         //cout<<"node.cost   t.cost: "<<node.cost<<"   "<<t.cost<<endl;
         return t;
     }
+    */
     bool operator==(const TreeNode &node)const{
         if(node.constraints==this->constraints&&node.solution==this->solution&&node.cost==this->cost) return true;
         else return false;
+    }
+    bool operator<(const TreeNode&other)const{
+        return cost>other.cost;
     }
     //TreeNode(std::vector<Constraint_my>&constraints);
     ~TreeNode();
     
 };
+struct compareFocal_high
+{
+    bool operator()(const high_handle &a,const high_handle &b)const{
+        if((*a).focal!=(*b).focal){
+            return (*a).focal>(*b).focal;
+        }
+        return (*a).cost>(*b).cost;
+    }
+};
+typedef typename boost::heap::d_ary_heap<high_handle,boost::heap::arity<2>,boost::heap::mutable_<true>,boost::heap::compare<compareFocal_high>> high_focal;
 class MAPFPlanner
 {
 public:
     
     SharedEnvironment* env;
-    TreeNode root;
-    std::vector<TreeNode> tree;
+    high_open high_open_;
+    high_focal high_focal_;
     std::atomic<bool> lock1;
     bool start=true;
+    std::vector<std::vector<pair<int,int>>>ret;
 	MAPFPlanner(SharedEnvironment* env): env(env){};
     MAPFPlanner(){
         env = new SharedEnvironment();
@@ -100,5 +138,68 @@ public:
     bool hasEdgeConflict(TreeNode&node);
     bool hasEdgeConflict(std::vector<pair<int,int>>&a,std::vector<pair<int,int>>&b);
     Conflict_my getFirstConflict(TreeNode&node);
+    int focal_heuristic(vector<vector<pair<int,int>>>&solutions);
     
 };
+typedef typename boost::heap::d_ary_heap<Node,boost::heap::arity<2>,boost::heap::mutable_<true>>open_t;
+typedef typename open_t::handle_type heap_handle_t;
+struct Node
+{
+    Node(const State_my&state,int fscore,int gscore,int focal):state(state),fscore(fscore),gscore(gscore),focal(focal){}
+    
+    bool operator<(const Node &other)const{
+        if(fscore!=other.fscore) return fscore>other.fscore;
+        else return gscore<other.gscore;
+    }
+    
+    State_my state;
+    int fscore;
+    int gscore;
+    int focal;
+    heap_handle_t handle;
+    
+};
+/*
+struct compareFscore
+{
+    bool operator()(const Node*a,const Node*b) const
+    {
+        if((*a).fscore!=(*b).fscore)
+            return a->fscore>b->fscore;
+        else return a->gscore<b->gscore;
+    }
+};
+*/
+
+
+
+
+struct compareFocal
+{
+    bool operator()(const heap_handle_t&a,const heap_handle_t&b) const
+    {
+        if((*a).focal!=(*b).focal){
+            return (*a).focal>(*b).focal;
+        }else if((*a).fscore!=(*b).fscore){
+            return (*a).fscore>(*b).fscore;
+        }else return (*a).gscore<(*b).gscore;
+    }
+};
+
+typedef typename boost::heap::d_ary_heap<heap_handle_t,boost::heap::arity<2>,boost::heap::mutable_<true>,boost::heap::compare<compareFocal>> focal_t;
+
+
+namespace std {
+template <>
+struct hash<State_my> {
+  size_t operator()(const State_my& s) const {
+    size_t seed = 0;
+    boost::hash_combine(seed, s.location);
+    boost::hash_combine(seed, s.timestep);
+    boost::hash_combine(seed,s.orientation);
+    return seed;
+  }
+};
+}
+
+

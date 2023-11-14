@@ -193,7 +193,7 @@ void BaseSystem::simulate(int simulation_time)
         auto start = std::chrono::steady_clock::now();
 
         vector<Action> actions = plan();
-
+        
         auto end = std::chrono::steady_clock::now();
 
         timestep += 1;

@@ -28,7 +28,7 @@ bool ActionModelWithRotate::is_valid(const vector<State>& prev, const vector<Act
     vector<State> next = result_states(prev, actions);
     unordered_map<int, int> vertex_occupied;
     unordered_map<pair<int, int>, int> edge_occupied;
-
+    
     for (int i = 0; i < prev.size(); i ++) 
     {
         
@@ -36,17 +36,20 @@ bool ActionModelWithRotate::is_valid(const vector<State>& prev, const vector<Act
             (abs(next[i].location / cols - prev[i].location/cols) + abs(next[i].location % cols - prev[i].location %cols) > 1 ))
         {
             cout << "ERROR: agent " << i << " moves out of map size. " << endl;
+            cout<<prev[i].location<<" "<<next[i].location<<" "<<endl;
             errors.push_back(make_tuple("unallowed move",i,-1,next[i].timestep));
             return false;
         }
         if (grid.map[next[i].location] == 1) {
             cout << "ERROR: agent " << i << " moves to an obstacle. " << endl;
+            cout<<prev[i].location<<" "<<next[i].location<<endl;
             errors.push_back(make_tuple("unallowed move",i,-1,next[i].timestep));
             return false;
         }
 
         if (vertex_occupied.find(next[i].location) != vertex_occupied.end()) {
             cout << "ERROR: agents " << i << " and " << vertex_occupied[next[i].location] << " have a vertex conflict. " << endl;
+            //cout<<"next location "<<next[i].location<<" prev location "<<prev[i].location<<" agent "<<i<<endl;
             errors.push_back(make_tuple("vertex conflict",i,vertex_occupied[next[i].location], next[i].timestep));
             return false;
         }
@@ -54,12 +57,11 @@ bool ActionModelWithRotate::is_valid(const vector<State>& prev, const vector<Act
         int edge_idx = (prev[i].location + 1) * rows * cols +  next[i].location;
 
         if (edge_occupied.find({prev[i].location, next[i].location}) != edge_occupied.end()) {
-            cout << "ERROR: agents " << i << " and " << edge_occupied[{prev[i].location, next[i].location}] << " have an edge conflict. " << endl;
+            //cout << "ERROR: agents " << i << " and " << edge_occupied[{prev[i].location, next[i].location}] << " have an edge conflict. " << endl;
             errors.push_back(make_tuple("edge conflict", i, edge_occupied[{prev[i].location, next[i].location}], next[i].timestep));
             return false;
         }
         
-
         vertex_occupied[next[i].location] = i;
         int r_edge_idx = (next[i].location + 1) * rows * cols +  prev[i].location;
         edge_occupied[{next[i].location, prev[i].location}] = i;
